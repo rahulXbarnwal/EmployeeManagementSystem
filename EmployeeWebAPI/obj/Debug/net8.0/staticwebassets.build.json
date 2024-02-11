@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "i0/SnvDVLOtSHkf7JewPS1QzMFXO8jcwzFW8hlERQI8=",
+  "Source": "EmployeeWebAPI",
+  "BasePath": "_content/EmployeeWebAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
