@@ -1,6 +1,4 @@
-// Dashboard.js
-
-import "./Dashboard.css"; // Make sure this path is correct
+import "./Dashboard.css";
 
 import { Box, Button } from "@mui/material";
 import React, { useEffect, useState } from "react";

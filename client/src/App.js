@@ -1,7 +1,7 @@
 import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 
-import { AuthProvider, useAuth } from "./context/AuthContext"; // Adjust the import path as needed
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import Dashboard from "./components/Dashboard/Dashboard";

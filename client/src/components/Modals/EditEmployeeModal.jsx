@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
-import API from "../../API"; // Ensure this is correctly pointing to your API configuration
+import API from "../../API";
 import axios from "axios";
 import { toast } from "react-toastify";
 
