@@ -3,3 +3,13 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+button:focus,
+.MuiButton-root:focus,
+.MuiIconButton-root:focus {
+  outline: none;
+}
+
+a:focus {
+  outline: none;
+}

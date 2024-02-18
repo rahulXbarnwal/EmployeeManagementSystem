@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EmployeeWebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeWebAPI.Data.Repository
 {
@@ -21,15 +22,26 @@ namespace EmployeeWebAPI.Data.Repository
             return await _dbContext.Employees.FindAsync(id);
         }
 
-        public async Task<int> CreateAsync(Employee employee)
+        public async Task<Employee> FindByEmailAsync(string email)
         {
-            _dbContext.Employees.Add(employee);
-            return await _dbContext.SaveChangesAsync();
+            return await _dbContext.Employees.FirstOrDefaultAsync(e => e.Email == email);
+        }
+
+        public async Task<Employee> CreateAsync(Employee employee)
+        {
+            await _dbContext.Employees.AddAsync(employee);
+            await _dbContext.SaveChangesAsync();
+            return employee;
         }
 
         public async Task<int> UpdateAsync(Employee employee)
         {
-            _dbContext.Entry(employee).State = EntityState.Modified;
+            var existingEmployee = await _dbContext.Employees.FindAsync(employee.ID);
+            if (existingEmployee == null)
+            {
+                throw new KeyNotFoundException("Employee not found.");
+            }
+            _dbContext.Entry(existingEmployee).CurrentValues.SetValues(employee);
             return await _dbContext.SaveChangesAsync();
         }
 

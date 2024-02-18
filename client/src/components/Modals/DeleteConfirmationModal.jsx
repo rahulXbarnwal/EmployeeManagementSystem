@@ -11,6 +11,7 @@ import API from "../../API";
 import React from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
 
 const DeleteConfirmationModal = ({
   open,
@@ -18,16 +19,21 @@ const DeleteConfirmationModal = ({
   employeeId,
   fetchEmployees,
 }) => {
+  const { token } = useAuth();
   const handleDelete = async () => {
     try {
-      await axios.delete(`${API.deleteEmployee}/${employeeId}`);
+      await axios.delete(`${API.deleteEmployee}/${employeeId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       toast.success("Employee deleted successfully", {
         position: "bottom-right",
       });
       fetchEmployees();
     } catch (error) {
-      console.error("Failed to delete employee:", error);
-      toast.error("Failed to delete employee", {
+      console.log(error);
+      toast.error(`Error Occurred`, {
         position: "bottom-right",
       });
     } finally {

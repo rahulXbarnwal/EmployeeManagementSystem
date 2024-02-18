@@ -11,8 +11,10 @@ import React, { useEffect, useState } from "react";
 import API from "../../API";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
 
 const EditEmployeeModal = ({ open, onClose, employee, fetchEmployees }) => {
+  const { token } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,7 +28,7 @@ const EditEmployeeModal = ({ open, onClose, employee, fetchEmployees }) => {
 
   useEffect(() => {
     if (employee) {
-      const { id, ...rest } = employee;
+      const { id, isActive, ...rest } = employee;
       setFormData(rest);
     }
   }, [employee]);
@@ -57,12 +59,34 @@ const EditEmployeeModal = ({ open, onClose, employee, fetchEmployees }) => {
     }
   };
 
+  const createJsonPatchDocument = (formData) => {
+    const patchDocument = [];
+
+    for (const key in formData) {
+      if (formData[key] !== "") {
+        patchDocument.push({
+          op: "replace",
+          path: `/${key}`,
+          value: formData[key],
+        });
+      }
+    }
+
+    return patchDocument;
+  };
+
   const handleSave = async () => {
     if (validateForm()) {
+      const patchDocument = createJsonPatchDocument(formData);
       try {
-        const response = await axios.put(
+        const response = await axios.patch(
           `${API.updateEmployee}/${employee.id}`,
-          { ...formData, id: employee.id }
+          patchDocument,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         if (response.status === 200) {
           toast.success("Employee details updated successfully.", {
@@ -75,10 +99,10 @@ const EditEmployeeModal = ({ open, onClose, employee, fetchEmployees }) => {
           });
         }
       } catch (error) {
-        toast.error("Failed to update employee details.", {
+        console.log(error);
+        toast.error(`Error Occurred`, {
           position: "bottom-right",
         });
-        console.error("Update error:", error);
       }
       onClose();
     }

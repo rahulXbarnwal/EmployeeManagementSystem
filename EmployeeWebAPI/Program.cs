@@ -1,33 +1,58 @@
-using EmployeeWebAPI.Configurations;
 using EmployeeWebAPI.Data;
 using EmployeeWebAPI.Data.Repository;
+using EmployeeWebAPI.Middlewares;
+using EmployeeWebAPI.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+// Configure JWT Settings
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+// Configure Entity Framework Core with Npgsql
 builder.Services.AddDbContext<EmployeeDBContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("EmployeeAppDBConnection"));
-});
+    options.UseNpgsql(builder.Configuration.GetConnectionString("EmployeeAppDBConnection")));
 
-builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
+// Configure Authentication with JWT Bearer
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 
+// Register Repository as a scoped dependency
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IQualificationRepository, QualificationRepository>();
+builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 
+// Configure AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
+
+// Configure CORS to allow any origin, header, and method
 builder.Services.AddCors(options => options.AddPolicy("MyTestCORS", policy =>
 {
-    //Allow all origins
     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
 }));
 
-builder.Services.AddControllers(
-    //options => options.ReturnHttpNotAcceptable = true
-    ).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+// Add controllers and configure JSON and XML formatters
+builder.Services.AddControllers()
+    .AddNewtonsoftJson()
+    .AddXmlDataContractSerializerFormatters();
 
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -42,9 +67,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Use CORS policy
 app.UseCors("MyTestCORS");
 
+// Use Authentication & Authorization
+app.UseAuthentication(); // Ensure to call UseAuthentication before UseAuthorization
 app.UseAuthorization();
+
+app.UseMiddleware<CustomAuthenticationMiddleware>();
 
 app.MapControllers();
 

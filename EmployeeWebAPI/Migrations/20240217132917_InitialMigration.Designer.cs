@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EmployeeWebAPI.Migrations
 {
     [DbContext(typeof(EmployeeDBContext))]
-    [Migration("20240211140925_CreateEmployeeTables")]
-    partial class CreateEmployeeTables
+    [Migration("20240217132917_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,7 +24,7 @@ namespace EmployeeWebAPI.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("EmployeeWebAPI.Data.Employee", b =>
+            modelBuilder.Entity("Employee", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -44,6 +44,9 @@ namespace EmployeeWebAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -61,7 +64,43 @@ namespace EmployeeWebAPI.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Employee");
+                    b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("User", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("User", b =>
+                {
+                    b.HasOne("Employee", "Employee")
+                        .WithOne("User")
+                        .HasForeignKey("User", "UserId");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Employee", b =>
+                {
+                    b.Navigation("User")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

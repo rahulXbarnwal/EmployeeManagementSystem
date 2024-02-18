@@ -21,7 +21,41 @@ namespace EmployeeWebAPI.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("EmployeeWebAPI.Data.Employee", b =>
+            modelBuilder.Entity("Document", b =>
+                {
+                    b.Property<int>("DocumentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DocumentId"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("DocumentName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Remarks")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("DocumentId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("Documents");
+                });
+
+            modelBuilder.Entity("Employee", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -41,6 +75,9 @@ namespace EmployeeWebAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -58,7 +95,103 @@ namespace EmployeeWebAPI.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Employee");
+                    b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("EmployeeWebAPI.Models.Qualification", b =>
+                {
+                    b.Property<int>("QualificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("QualificationId"));
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Institution")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Percentage")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("QualificationName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Stream")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("YearOfPassing")
+                        .HasColumnType("integer");
+
+                    b.HasKey("QualificationId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("Qualifications");
+                });
+
+            modelBuilder.Entity("User", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Document", b =>
+                {
+                    b.HasOne("Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("EmployeeWebAPI.Models.Qualification", b =>
+                {
+                    b.HasOne("Employee", "Employee")
+                        .WithMany("Qualifications")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("User", b =>
+                {
+                    b.HasOne("Employee", "Employee")
+                        .WithOne("User")
+                        .HasForeignKey("User", "UserId");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Employee", b =>
+                {
+                    b.Navigation("Qualifications");
+
+                    b.Navigation("User")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

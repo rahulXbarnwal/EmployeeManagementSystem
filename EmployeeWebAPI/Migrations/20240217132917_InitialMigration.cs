@@ -6,13 +6,13 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EmployeeWebAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateEmployeeTables : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Employee",
+                name: "Employees",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "integer", nullable: false)
@@ -23,11 +23,31 @@ namespace EmployeeWebAPI.Migrations
                     Title = table.Column<string>(type: "text", nullable: false),
                     Phone = table.Column<string>(type: "text", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
-                    Salary = table.Column<decimal>(type: "numeric", nullable: false)
+                    Salary = table.Column<decimal>(type: "numeric", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employee", x => x.ID);
+                    table.PrimaryKey("PK_Employees", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    IsAdmin = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_Users_Employees_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Employees",
+                        principalColumn: "ID");
                 });
         }
 
@@ -35,7 +55,10 @@ namespace EmployeeWebAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Employee");
+                name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Employees");
         }
     }
 }

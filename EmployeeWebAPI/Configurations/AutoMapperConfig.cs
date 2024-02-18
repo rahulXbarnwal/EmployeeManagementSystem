@@ -1,16 +1,22 @@
 ﻿using AutoMapper;
-using EmployeeWebAPI.Data;
+using EmployeeWebAPI.DTOs;
 using EmployeeWebAPI.Models;
 
-namespace EmployeeWebAPI.Configurations
+public class AutoMapperConfig : Profile
 {
-    public class AutoMapperConfig : Profile
+    public AutoMapperConfig()
     {
-        public AutoMapperConfig() 
-        { 
-            CreateMap<EmployeeDTO, Employee>().ReverseMap()
-                .ForMember(n => n.Address, opt => opt.MapFrom(n => string.IsNullOrEmpty(n.Address) ? "No address found": n.Address))
-                .AddTransform<string>(n => string.IsNullOrEmpty(n) ? "No data found": n);
-        }
+        CreateMap<User, UserDTO>()
+            .ReverseMap()
+            .ForMember(dest => dest.Password, opt => opt.Ignore());
+
+        CreateMap<Employee, EmployeeDTO>()
+            .ReverseMap();
+
+        CreateMap<Qualification, QualificationDTO>()
+            .ReverseMap();
+
+        CreateMap<Document, DocumentDTO>()
+            .ReverseMap();
     }
 }

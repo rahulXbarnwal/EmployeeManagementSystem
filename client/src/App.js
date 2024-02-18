@@ -4,18 +4,11 @@ import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-import Dashboard from "./components/Dashboard/Dashboard";
+import AdminDashboard from "./components/Dashboards/AdminDashboard";
+import Dashboard from "./components/Dashboards/Dashboard";
 import Login from "./components/Login/Login";
 import React from "react";
 import { ToastContainer } from "react-toastify";
-
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) {
-    return <Navigate to="/" />;
-  }
-  return children;
-};
 
 const App = () => {
   return (
@@ -23,32 +16,39 @@ const App = () => {
       <ToastContainer />
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Login />} />
           <Route
-            path="/"
+            path="/adminDashboard"
             element={
-              <PublicOnlyRoute>
-                <Login />
-              </PublicOnlyRoute>
+              <ProtectedRoute isAdminRequired={true}>
+                <AdminDashboard />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute isAdminRequired={false}>
                 <Dashboard />
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+          <Route path="*" element={<Navigate to="/adminDashboard" />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
 };
 
-function PublicOnlyRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <Navigate to="/dashboard" /> : children;
-}
+const ProtectedRoute = ({ children, isAdminRequired }) => {
+  const { token, isAdmin } = useAuth();
+  if (!token) {
+    return <Navigate to="/" />;
+  }
+  if (isAdminRequired && !isAdmin) {
+    return <Navigate to="/dashboard" />;
+  }
+  return children;
+};
 
 export default App;
