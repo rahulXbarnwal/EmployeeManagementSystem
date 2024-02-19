@@ -40,5 +40,19 @@ namespace EmployeeWebAPI.Data.Repository
             return await _context.Qualifications
                 .Where(q => q.QualificationId == qualificationId).FirstOrDefaultAsync();
         }
+
+        public async Task UpdateAsync(Qualification qualification)
+        {
+            _context.Qualifications.Update(qualification);
+            await Task.CompletedTask;
+        }
+
+        public async Task DeleteQualificationsAsync(IEnumerable<int> qualificationIds)
+        {
+            var qualifications = await _context.Qualifications
+                .Where(q => qualificationIds.Contains(q.QualificationId))
+                .ToListAsync();
+            _context.Qualifications.RemoveRange(qualifications);
+        }
     }
 }

@@ -112,26 +112,6 @@ namespace EmployeeWebAPI.Controllers
             return Ok(documentDtos);
         }
 
-        [HttpPut("{documentId}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> EditDocument(int documentId, [FromBody] DocumentDTO documentDto)
-        {
-            var document = await _documentRepository.GetDocumentByIdAsync(documentId);
-            if (document == null) return NotFound();
-
-            _mapper.Map(documentDto, document);
-            await _documentRepository.UpdateDocumentAsync(document);
-            return Ok("Document Updated!");
-        }
-
-        [HttpDelete("{documentId}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteDocument(int documentId)
-        {
-            await _documentRepository.DeleteDocumentAsync(documentId);
-            return Ok("Document Deleted Successfully!");
-        }
-
         [HttpGet("DownloadDocument/{documentId}")]
         [Authorize]
         public async Task<IActionResult> DownloadDocument(int documentId)
@@ -180,6 +160,14 @@ namespace EmployeeWebAPI.Controllers
 
             Response.Headers.Add("Content-Disposition", $"inline; filename=\"{document.DocumentName}\"");
             return File(document.Data, document.ContentType, document.DocumentName);
+        }
+
+        [HttpDelete("{documentId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteDocument(int documentId)
+        {
+            await _documentRepository.DeleteDocumentAsync(documentId);
+            return Ok("Document Deleted Successfully!");
         }
     }
 }

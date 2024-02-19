@@ -4,6 +4,8 @@ namespace EmployeeWebAPI.DTOs
 {
     public class QualificationDTO
     {
+        public int QualificationId { get; set; }
+
         [Required]
         public string QualificationName { get; set; } = string.Empty;
 

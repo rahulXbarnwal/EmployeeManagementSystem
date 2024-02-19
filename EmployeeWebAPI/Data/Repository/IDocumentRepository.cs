@@ -5,7 +5,7 @@
         Task<IEnumerable<Document>> GetAllDocumentsByEmployeeIdAsync(int employeeId);
         Task<Document> GetDocumentByIdAsync(int documentId);
         Task<Document> AddDocumentAsync(Document document);
-        Task<Document> UpdateDocumentAsync(Document document);
+        Task SaveChangesAsync();
         Task DeleteDocumentAsync(int documentId);
     }
 }

@@ -123,4 +123,59 @@ public class QualificationsController : ControllerBase
             return StatusCode(500, "An error occurred while processing your request.");
         }
     }
+
+    [HttpPut("Update")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateQualifications([FromBody] List<QualificationDTO> qualificationDtos)
+    {
+        if (qualificationDtos == null || !qualificationDtos.Any())
+        {
+            return BadRequest("Qualification data must be provided.");
+        }
+        try
+        {
+            foreach (var qualificationDto in qualificationDtos)
+            {
+                var qualification = await _qualificationRepository.GetQualificationByIdAsync(qualificationDto.QualificationId);
+                if (qualification == null)
+                {
+                    return NotFound($"Qualification with ID {qualificationDto.QualificationId} not found.");
+                }
+
+                _mapper.Map(qualificationDto, qualification);
+
+                await _qualificationRepository.UpdateAsync(qualification);
+            }
+
+            await _qualificationRepository.SaveChangesAsync();
+
+            return Ok("Qualifications updated successfully.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An internal error occurred. {ex.Message}");
+        }
+    }
+
+    [HttpPost("Delete")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteQualifications([FromBody] int[] qualificationIds)
+    {
+        if (qualificationIds == null || qualificationIds.Length == 0)
+        {
+            return BadRequest("No qualification IDs provided.");
+        }
+
+        try
+        {
+            await _qualificationRepository.DeleteQualificationsAsync(qualificationIds);
+            await _qualificationRepository.SaveChangesAsync();
+
+            return Ok("Qualifications deleted successfully.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An internal error occurred. {ex.Message}");
+        }
+    }
 }

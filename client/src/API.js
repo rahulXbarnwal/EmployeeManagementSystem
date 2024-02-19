@@ -14,7 +14,10 @@ const API = {
   getAllDocsOfAnEmployee: url + "/Documents/Employee",
   downloadDocument: url + "/Documents/DownloadDocument",
   previewDocument: url + "/Documents/View",
+  deleteDocument: url + "/Documents",
   getQualificationsOfAnEmployee: url + "/Qualifications/Employee",
+  deleteQualifications: url + "/Qualifications/Delete",
+  updateQualifications: url + "/Qualifications/Update",
 };
 
 export default API;

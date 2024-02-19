@@ -8,6 +8,7 @@ import {
 import React, { useEffect, useState } from "react";
 
 import API from "../../API";
+import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import axios from "axios";
@@ -33,27 +34,27 @@ const DocumentsModal = ({ open, onClose, employeeId, token }) => {
   const [previewDocUrl, setPreviewDocUrl] = useState("");
   const [previewDocType, setPreviewDocType] = useState("");
 
-  useEffect(() => {
-    const fetchDocuments = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axios.get(
-          `${API.getAllDocsOfAnEmployee}/${employeeId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setDocuments(response.data);
-      } catch (error) {
-        console.error("Failed to fetch documents:", error);
-        toast.error("Failed to fetch documents.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchDocuments = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${API.getAllDocsOfAnEmployee}/${employeeId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setDocuments(response.data);
+    } catch (error) {
+      console.error("Failed to fetch documents:", error);
+      toast.error("Failed to fetch documents.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (open) {
       fetchDocuments();
     }
@@ -103,6 +104,26 @@ const DocumentsModal = ({ open, onClose, employeeId, token }) => {
     } catch (error) {
       console.error("Error fetching document for preview:", error);
       toast.error("Failed to load document for preview.");
+    }
+  };
+
+  const handleDelete = async (docId) => {
+    try {
+      await axios.delete(`${API.deleteDocument}/${docId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const newDocuments = documents.filter((doc) => doc.documentId != docId);
+      setDocuments(newDocuments);
+      fetchDocuments();
+      return toast.success(`Document deleted successfully!`, {
+        position: "bottom-right",
+      });
+    } catch (error) {
+      return toast.error(`Error deleting document!`, {
+        position: "bottom-right",
+      });
     }
   };
 
@@ -182,6 +203,9 @@ const DocumentsModal = ({ open, onClose, employeeId, token }) => {
                     }
                   >
                     <DownloadIcon />
+                  </IconButton>
+                  <IconButton onClick={() => handleDelete(doc.documentId)}>
+                    <DeleteIcon />
                   </IconButton>
                 </div>
               </Box>

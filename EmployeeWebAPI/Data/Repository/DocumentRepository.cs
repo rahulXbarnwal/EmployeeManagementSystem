@@ -28,11 +28,9 @@ namespace EmployeeWebAPI.Data.Repository
             return document;
         }
 
-        public async Task<Document> UpdateDocumentAsync(Document document)
+        public async Task SaveChangesAsync()
         {
-            _context.Documents.Update(document);
             await _context.SaveChangesAsync();
-            return document;
         }
 
         public async Task DeleteDocumentAsync(int documentId)
