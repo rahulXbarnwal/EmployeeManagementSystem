@@ -1,4 +1,5 @@
-const url = "http://localhost:5136/api";
+// const url = "http://localhost:5136/api";
+const url = "https://employeemanagementsystem-k27a.onrender.com/api";
 
 const API = {
   registerAdmin: url + "/Auth/register",

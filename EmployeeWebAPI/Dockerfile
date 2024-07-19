@@ -14,4 +14,6 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build-env /app/out .
+
+# Optionally run migrations (ensure dotnet-ef tool is available)
 ENTRYPOINT ["dotnet", "EmployeeWebAPI.dll"]
